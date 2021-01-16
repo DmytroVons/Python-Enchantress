@@ -61,4 +61,3 @@ class HenHouse:
         else:
             raise ConnectionError()
 
-
