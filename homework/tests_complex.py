@@ -1,7 +1,5 @@
-from unittest import mock
-
-
 class Test:
+
     def __enter__(self):
         return self
 
@@ -19,3 +17,5 @@ def new_test():
 def func():
     with new_test() as t:
         return t.hello()
+
+
