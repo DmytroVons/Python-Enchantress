@@ -3,3 +3,5 @@ __pycache__/
 *.py[cod]
 .idea
 venv/
+homework/sql_practice/.pytest_cache
+homework/sql_practice/db_logger.log
