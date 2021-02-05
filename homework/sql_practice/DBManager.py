@@ -13,6 +13,7 @@ class DBManager:
             self.cursor = self.connection.cursor()
         except ConnectionError:
             logger.debug("Problem with connection")
+            raise psycopg2.Error
         else:
             logger.info("Database opened successfully")
 
@@ -23,6 +24,7 @@ class DBManager:
                 user_info)
         except Exception:
             logger.debug("Insert new user was failed!")
+            raise psycopg2.Error
         else:
             logger.info('Insert new user was successfully')
 
@@ -31,6 +33,7 @@ class DBManager:
             self.cursor.execute("SELECT * From users WHERE id=%s;", (_id,))
         except Exception:
             logger.debug("Read user from database was failed")
+            raise psycopg2.Error
         else:
             logger.info("Read user from database was successfully")
             for row in self.cursor:
@@ -41,6 +44,7 @@ class DBManager:
             self.cursor.execute(f"UPDATE users SET name = (%(name)s), email = (%(email)s) WHERE id = {_id};", new_info)
         except Exception:
             logger.debug("Update user in database was failed!")
+            raise psycopg2.Error
         else:
             logger.info("Update user in database was successfully")
 
@@ -49,6 +53,7 @@ class DBManager:
             self.cursor.execute("DELETE FROM users WHERE id=%s;", (_id,))
         except Exception as err:
             logger.debug(f"Delete user from database was failed! {err}")
+            raise psycopg2.Error
         else:
             logger.info("Delete user from database was successfully")
 
@@ -57,6 +62,7 @@ class DBManager:
             self.cursor.execute("INSERT INTO cart (creation_time, user_id) VALUES (%(creation_time)s, %(user_id)s);", cart)
         except Exception:
             logger.debug("Insert new cart was failed!")
+            raise psycopg2.Error
         else:
             logger.info('Insert new cart was successfully')
 
@@ -65,6 +71,7 @@ class DBManager:
             self.cursor.execute("SELECT * From cart WHERE id=%s;", (_id,))
         except Exception:
             logger.debug("Read cart from shop database was failed")
+            raise psycopg2.Error
         else:
             logger.info("Read cart from shop database was successfully")
             for row in self.cursor:
@@ -75,6 +82,7 @@ class DBManager:
             self.cursor.execute("UPDATE cart SET creation_time = (%(creation_time)s), user_id = (%(user_id)s) WHERE user_id = (%(user_id)s);", cart)
         except Exception:
             logger.debug("Update cart in shop database was failed!")
+            raise psycopg2.Error
         else:
             logger.info("Update cart in shop database was successfully")
 
@@ -84,6 +92,7 @@ class DBManager:
             self.cursor.execute("DELETE FROM cart WHERE id=%s;", (_id,))
         except Exception as err:
             logger.debug(f"Delete cart from shop database was failed! {err}")
+            raise psycopg2.Error
         else:
             logger.info("Delete cart from shop database was successfully")
 
@@ -92,6 +101,7 @@ class DBManager:
             self.connection.commit()
         except Exception:
             logger.debug("Database commit was failed!")
+            raise psycopg2.Error
         else:
             logger.info("Database commit successfuly")
 
@@ -100,6 +110,7 @@ class DBManager:
             self.cursor.close()
         except Exception:
             logger.debug("Cursor stoping was failed!")
+            raise psycopg2.Error
         else:
             logger.info("Cursor was stop successfuly")
 
@@ -108,24 +119,26 @@ class DBManager:
             self.connection.close()
         except Exception:
             logger.debug("Connection close was failed")
+            raise psycopg2.Error
         else:
             logger.info("Connection to database stop successfuly")
 
 
 if __name__ == '__main__':
-    # dbmanager = DBManager()
-    # dbmanager.create_user(
-    #     {'name': 'Vitalik', 'email': 'vitalik@gmail.com', 'registration_time': '2021-02-03 23:32:12'})
-    # dbmanager.read_user_info(8)
-    # dbmanager.update_user({'name': 'Roman', 'email': 'roman@gmail.com'}, 8)
-    # dbmanager.read_user_info(8)
-    # dbmanager.delete_user(8)
-    # dbmanager.create_cart({'creation_time': '2021-02-04 17:40:59', 'user_id': '3'})
-    # dbmanager.read_cart(3)
-    # dbmanager.update_cart({'creation_time': '2021-02-05 18:59:59', 'user_id': '2'})
-    # dbmanager.read_cart(2)
-    # dbmanager.delete_cart(3)
-    # dbmanager.commit_db()
-    # dbmanager.close_cursor()
-    # dbmanager.connection_close()
-    pass
+    dbmanager = DBManager()
+    dbmanager.create_user(
+        {'name': 'Romko', 'email': 'vitalik@gmail.com', 'registration_time': '2021-02-04 17:40:59'})
+    dbmanager.read_user_info(6)
+    dbmanager.update_user({'name': 'Roman', 'email': 'roman@gmail.com'}, 8)
+    dbmanager.read_user_info(1)
+    dbmanager.delete_user(8)
+    dbmanager.create_cart({'creation_time': '2021-02-04 17:40:59', 'user_id': '3'})
+    dbmanager.read_cart(3)
+    dbmanager.update_cart({'creation_time': '2021-02-05 18:59:59', 'user_id': '2'})
+    dbmanager.read_cart(2)
+    dbmanager.delete_cart(6)
+    dbmanager.delete_cart(5)
+    dbmanager.delete_cart(7)
+    dbmanager.commit_db()
+    dbmanager.close_cursor()
+    dbmanager.connection_close()
