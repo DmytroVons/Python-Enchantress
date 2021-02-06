@@ -4,6 +4,10 @@ from loguru import logger
 logger.add('db_logger.log', format='{time} {message} {level}', level='DEBUG', rotation='10 MB', compression='zip')
 
 
+class CustomError(Exception):
+    pass
+
+
 class DBManager:
 
     def __init__(self):
@@ -13,7 +17,7 @@ class DBManager:
             self.cursor = self.connection.cursor()
         except ConnectionError:
             logger.debug("Problem with connection")
-            raise psycopg2.Error
+            raise CustomError("Connection problem, check inputed data!")
         else:
             logger.info("Database opened successfully")
 
@@ -23,8 +27,8 @@ class DBManager:
                 "INSERT INTO users (name, email, registration_time) VALUES (%(name)s, %(email)s, %(registration_time)s);",
                 user_info)
         except Exception:
-            logger.debug("Insert new user was failed!")
-            raise psycopg2.Error
+            logger.debug("Insert new user wffas failed!")
+            raise CustomError("User didn`t add to the shop database, data was inputed incorrectly!")
         else:
             logger.info('Insert new user was successfully')
 
@@ -33,7 +37,7 @@ class DBManager:
             self.cursor.execute("SELECT * From users WHERE id=%s;", (_id,))
         except Exception:
             logger.debug("Read user from database was failed")
-            raise psycopg2.Error
+            raise CustomError("Couldn`t get user from shop database, check inputed data and try again!")
         else:
             logger.info("Read user from database was successfully")
             for row in self.cursor:
@@ -44,7 +48,7 @@ class DBManager:
             self.cursor.execute(f"UPDATE users SET name = (%(name)s), email = (%(email)s) WHERE id = {_id};", new_info)
         except Exception:
             logger.debug("Update user in database was failed!")
-            raise psycopg2.Error
+            raise CustomError("Couldn`t update user in shop database, check inputed data!")
         else:
             logger.info("Update user in database was successfully")
 
@@ -53,16 +57,17 @@ class DBManager:
             self.cursor.execute("DELETE FROM users WHERE id=%s;", (_id,))
         except Exception as err:
             logger.debug(f"Delete user from database was failed! {err}")
-            raise psycopg2.Error
+            raise CustomError("Couldn`t delete user from shop database.")
         else:
             logger.info("Delete user from database was successfully")
 
     def create_cart(self, cart: dict):
         try:
-            self.cursor.execute("INSERT INTO cart (creation_time, user_id) VALUES (%(creation_time)s, %(user_id)s);", cart)
+            self.cursor.execute("INSERT INTO cart (creation_time, user_id) VALUES (%(creation_time)s, %(user_id)s);",
+                                cart)
         except Exception:
             logger.debug("Insert new cart was failed!")
-            raise psycopg2.Error
+            raise CustomError("Cart didn`t add to the shop database, data was inputed incorrectly!")
         else:
             logger.info('Insert new cart was successfully')
 
@@ -71,7 +76,7 @@ class DBManager:
             self.cursor.execute("SELECT * From cart WHERE id=%s;", (_id,))
         except Exception:
             logger.debug("Read cart from shop database was failed")
-            raise psycopg2.Error
+            raise CustomError("Couldn`t get cart from shop database, check inputed data and try again!")
         else:
             logger.info("Read cart from shop database was successfully")
             for row in self.cursor:
@@ -79,10 +84,12 @@ class DBManager:
 
     def update_cart(self, cart: dict):
         try:
-            self.cursor.execute("UPDATE cart SET creation_time = (%(creation_time)s), user_id = (%(user_id)s) WHERE user_id = (%(user_id)s);", cart)
+            self.cursor.execute(
+                "UPDATE cart SET creation_time = (%(creation_time)s), user_id = (%(user_id)s) WHERE user_id = (%(user_id)s);",
+                cart)
         except Exception:
             logger.debug("Update cart in shop database was failed!")
-            raise psycopg2.Error
+            raise CustomError("Couldn`t update cart in shop database, check inputed data!")
         else:
             logger.info("Update cart in shop database was successfully")
 
@@ -92,7 +99,7 @@ class DBManager:
             self.cursor.execute("DELETE FROM cart WHERE id=%s;", (_id,))
         except Exception as err:
             logger.debug(f"Delete cart from shop database was failed! {err}")
-            raise psycopg2.Error
+            raise CustomError("Couldn`t delete cart from shop database.")
         else:
             logger.info("Delete cart from shop database was successfully")
 
@@ -101,7 +108,7 @@ class DBManager:
             self.connection.commit()
         except Exception:
             logger.debug("Database commit was failed!")
-            raise psycopg2.Error
+            raise CustomError("Problem with commit database!")
         else:
             logger.info("Database commit successfuly")
 
@@ -110,7 +117,7 @@ class DBManager:
             self.cursor.close()
         except Exception:
             logger.debug("Cursor stoping was failed!")
-            raise psycopg2.Error
+            raise CustomError("Problem with closing cursor in database!")
         else:
             logger.info("Cursor was stop successfuly")
 
@@ -119,7 +126,7 @@ class DBManager:
             self.connection.close()
         except Exception:
             logger.debug("Connection close was failed")
-            raise psycopg2.Error
+            raise CustomError("Problem with closing connection database!")
         else:
             logger.info("Connection to database stop successfuly")
 
