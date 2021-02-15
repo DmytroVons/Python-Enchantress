@@ -121,7 +121,7 @@ def delete_cart(cart_id):
     try:
         del CART_DATABASE[cart_id]
     except KeyError:
-        raise NoSuchUser
+        raise NoSuchCart
     else:
         return {"status": "success"}, 200
 
