@@ -1,5 +1,5 @@
 from freezegun import freeze_time
-from Amazon_killer import USERS_DATABASE, CART_DATABASE, amazon_killer as app
+from Amazon_killer_2 import amazon_killer as app
 import pytest
 
 
@@ -62,7 +62,7 @@ def test_delete_user(store_app):
 @freeze_time('2021-02-12 00:00:01')
 def test_create_cart(store_app):
     response = store_app.post(
-        '/carts',
+        '/carts/new',
         json={
             "user_id": 1,
             "products": [
@@ -81,7 +81,7 @@ def test_create_cart(store_app):
         "cart_id": 1,
         "registration_timestamp": '2021-02-12T00:00:01'
     }
-    response = store_app.get('/carts/1')
+    response = store_app.get('/carts/get/1')
 
     assert response.status_code == 200
     assert response.json == {
@@ -102,20 +102,20 @@ def test_create_cart(store_app):
 
 
 def test_get_no_such_cart(store_app):
-    response = store_app.get('/carts/22')
+    response = store_app.get('/carts/get/22')
 
     assert response.status_code == 404
     assert response.json == {"error": "no such cart with id 22"}
 
 
 def test_update_cart(store_app):
-    response = store_app.put("/carts/1", json={"user_id": 1, "products": [{"product": 'fireworks', "price": 1500, }]})
+    response = store_app.put("/carts/update/1", json={"user_id": 1, "products": [{"product": 'fireworks', "price": 1500, }]})
     assert response.status_code == 200
     assert response.json == {"status": "success"}
 
 
 def test_delete_cart(store_app):
-    response = store_app.delete('/carts/1')
+    response = store_app.delete('/carts/delete/1')
 
     assert response.status_code == 200
     assert response.json == {"status": "success"}
